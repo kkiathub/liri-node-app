@@ -114,7 +114,7 @@ function displayCommands() {
     console.log("node liri.js do-what-it-says");
 }
 
-function readCommands(filebame) {
+function readCommands(filename) {
     fs.readFile(filename, "utf8", function(error, data) {
 
         // If the code experiences any errors it will log the error to the console.
@@ -124,42 +124,41 @@ function readCommands(filebame) {
         }
       
         // We will then print the contents of data. data is a string.
-        console.log(data);
+        // console.log(data);
       
         // Then split it by commas (to make it more readable)
         var dataArr = data.split(",");
       
         // We will then re-display the content as an array for later use.
-        console.log(dataArr);
+        var cmdStr = dataArr[0];
+        var datStr = dataArr[1].replace(/"/g, "");
+        runCommand(dataArr[0], datStr);
       
       });
 }
 
-if (process.argv.length === 2) {
-    displayCommands();
-} else {
-    var commandStr = process.argv[2];
+function runCommand(cmd, arg) {
 
-    switch (commandStr) {
+    switch (cmd) {
         case "concert-this":
-            if (titleStr.length === 0) {
+            if (arg.length === 0) {
                 console.log("Please enter artist or band name!");
                 break;
             }
-            var queryURL = "https://rest.bandsintown.com/artists/" + titleStr + "/events?app_id=codingbootcamp";
+            var queryURL = "https://rest.bandsintown.com/artists/" + arg + "/events?app_id=codingbootcamp";
             axios.get(queryURL).then(logConcert).catch(logError);
             break;
         case "spotify-this-song":
-            if (titleStr.length === 0) {
-                titleStr = "The Sign Ace of base";
+            if (arg.length === 0) {
+                arg = "The Sign Ace of base";
             }
-            spotify.search({ type: 'track', query: titleStr }).then(logSong).catch(logError);
+            spotify.search({ type: 'track', query: arg }).then(logSong).catch(logError);
             break;
         case "movie-this":
-            if (titleStr.length === 0) {
-                titleStr = "Mr. Nobody";
+            if (arg.length === 0) {
+                arg = "Mr. Nobody";
             }
-            var queryURL = "http://www.omdbapi.com/?t=" + titleStr + "&y=&plot=short&apikey=trilogy";
+            var queryURL = "http://www.omdbapi.com/?t=" + arg + "&y=&plot=short&apikey=trilogy";
             axios.get(queryURL).then(logMovie).catch(logError);
             break;
         case "do-what-it-says":
@@ -170,4 +169,12 @@ if (process.argv.length === 2) {
             displayCommands();
             break;
     }
+}
+
+// run this.
+
+if (process.argv.length === 2) {
+    displayCommands();
+} else {
+    runCommand(process.argv[2], titleStr);
 }
