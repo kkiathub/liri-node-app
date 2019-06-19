@@ -17,7 +17,11 @@ The is a node.js terminal based application.  Use will need to enter a command o
 6. All output data will be written into "log.txt" file.
 ![Image of log](images/logfile.jpg)
 
-### Click [here](https://github.com/kkiathub/liri-node-app) to go the the github repository.
+---
+
+There is no deployed version of this application since this is a javascript node application running on the terminal.   You can however view , download, and try running the code from github, but you will need to create your own .env for authentication purpose.
+
+---
 
 ### In the code...
     - We use node.js and javascript.
