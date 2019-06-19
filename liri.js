@@ -1,3 +1,8 @@
+// choose where the output will be logged to.
+const LOG_TO_FILE = true;
+var logFnc =  LOG_TO_FILE?logToFile:console.log;
+
+
 // read environment variables with dotenv package.
 require("dotenv").config();
 
@@ -19,24 +24,31 @@ var axios = require("axios");
 // creating titleStr 
 var titleStr = "";
 if (process.argv.length > 3) {
-    var titleStr = process.argv[3];
-    if (process.argv.length > 4) {
-        for (var i = 4; i < process.argv.length; i++) {
-            titleStr = titleStr + " " + process.argv[i];
+    var titleStr = process.argv.slice(3).join(" ");
+}
+
+function logToFile(text) {
+    fs.appendFileSync("log.txt", text + "\n", function (err) {
+
+        // If an error was experienced we will log it.
+        if (err) {
+            console.log(err);
         }
-    }
+    });
+}
+
+function logEndLine() {
+    logFnc("--------------------------------\n");
 }
 
 
 function logMovie(response) {
     if (response.data.Response == "False") {
-        console.log("Movie Not Found!");
+        logFnc("Movie Not Found!");
+        logEndLine();
         return;
     }
-    // console.log(response.data);
-    console.log("Title: " + response.data.Title);
-    console.log("Year Released : " + response.data.Year);
-    console.log("IMDB Rating " + response.data.imdbRating);
+
     var tomatoRating = "N/A";
     for (var i = 0; i < response.data.Ratings.length; i++) {
         if (response.data.Ratings[i].Source === "Rotten Tomatoes") {
@@ -44,37 +56,45 @@ function logMovie(response) {
             break;
         }
     }
-    console.log("Rotten Tomatoes Rating : " + tomatoRating);
-    console.log("Country : " + response.data.Country);
-    console.log("Language : " + response.data.Language);
-    console.log("Plot : " + response.data.Plot);
-    console.log("Actors : " + response.data.Actors);
+
+    // console.log(response.data);
+    logFnc("Title: " + response.data.Title);
+    logFnc("Year Released : " + response.data.Year);
+    logFnc("IMDB Rating " + response.data.imdbRating);
+    logFnc("Rotten Tomatoes Rating : " + tomatoRating);
+    logFnc("Country : " + response.data.Country);
+    logFnc("Language : " + response.data.Language);
+    logFnc("Plot : " + response.data.Plot);
+    logFnc("Actors : " + response.data.Actors);
+    logEndLine();
 }
 
 function logConcert(response) {
     // console.log(response.data);
-    console.log(response.data.length + " events found!");
+    logFnc(response.data.length + " events found!");
     for (var i = 0; i < response.data.length; i++) {
-        console.log("event " + (i + 1));
-        console.log("   Venue : " + response.data[i].venue.name);
-        console.log("     City    : " + response.data[i].venue.city);
-        console.log("     Region  : " + response.data[i].venue.region);
-        console.log("     Country : " + response.data[i].venue.country);
-        console.log("   Date of the event : " + moment(response.data[i].datetime).format("MM/DD/YYYY"));
+        logFnc("event " + (i + 1));
+        logFnc("   Venue : " + response.data[i].venue.name);
+        logFnc("     City    : " + response.data[i].venue.city);
+        logFnc("     Region  : " + response.data[i].venue.region);
+        logFnc("     Country : " + response.data[i].venue.country);
+        logFnc("   Date of the event : " + moment(response.data[i].datetime).format("MM/DD/YYYY"));
     }
+    logEndLine();
 }
 
 function logSong(response) {
     // console.log(response);
     if (response.tracks.items.length === 0) {
-        console.log("Song not found!");
+        logFnc("Song not found!");
+        logEndLine();
         return;
     }
     // console.log(response.tracks.items[0]);
     // Artist(s)
-    console.log("Artist(s) : " + response.tracks.items[0].artists[0].name);
+    logFnc("Artist(s) : " + response.tracks.items[0].artists[0].name);
     // The song's name
-    console.log("Song's name : " + response.tracks.items[0].name);
+    logFnc("Song's name : " + response.tracks.items[0].name);
 
     // A preview link of the song from Spotify
     var previewLink = response.tracks.items[0].preview_url;
@@ -82,59 +102,62 @@ function logSong(response) {
         previewLink = "N/A";
     }
 
-    console.log("Preview link : " + previewLink);
+    logFnc("Preview link : " + previewLink);
 
     // The album that the song is from
-    console.log("Album : " + response.tracks.items[0].album.name);
+    logFnc("Album : " + response.tracks.items[0].album.name);
+    logEndLine();
 }
 
 function logError(error) {
     if (error.response) {
         // The request was made and the server responded with a status code
         // that falls out of the range of 2xx
-        console.log(error.response.data);
-        console.log(error.response.status);
-        console.log(error.response.headers);
+       logFnc(error.response.data);
+       logFnc(error.response.status);
+       logFnc(error.response.headers);
     } else if (error.request) {
         // The request was made but no response was received
         // `error.request` is an object that comes back with details pertaining to the error that occurred.
-        console.log(error.request);
+       logFnc(error.request);
     } else {
         // Something happened in setting up the request that triggered an Error
-        console.log("Error", error.message);
+       logFnc("Error", error.message);
     }
-    console.log(error.config);
+   logFnc(error.config);
+   logEndLine();
 }
 
 function displayCommands() {
-    console.log("Please enter one of the following commands!");
-    console.log("node liri.js concert-this <artist/band name>");
-    console.log("node liri.js spotify-this-song <song name>");
-    console.log("node liri.js movie-this <movie name>");
-    console.log("node liri.js do-what-it-says");
+    logFnc("Please enter one of the following commands!");
+    logFnc("node liri.js concert-this <artist/band name>");
+    logFnc("node liri.js spotify-this-song <song name>");
+    logFnc("node liri.js movie-this <movie name>");
+    logFnc("node liri.js do-what-it-says");
+    logEndLine();
 }
 
-function readCommands(filename) {
-    fs.readFile(filename, "utf8", function(error, data) {
+function readCommandsFromFile(filename) {
+    fs.readFile(filename, "utf8", function (error, data) {
 
         // If the code experiences any errors it will log the error to the console.
-      
+
         if (error) {
-          return console.log(error);
+            return console.log(error);
         }
-      
+
         // We will then print the contents of data. data is a string.
         // console.log(data);
-      
+
         // Then split it by commas (to make it more readable)
         var dataArr = data.split(",");
-      
-        // We will then re-display the content as an array for later use.
+
+        // Extracting command and argument.
         var cmdStr = dataArr[0];
         var datStr = dataArr[1].replace(/"/g, "");
         runCommand(dataArr[0], datStr);
-      
-      });
+
+    });
 }
 
 function runCommand(cmd, arg) {
@@ -142,7 +165,8 @@ function runCommand(cmd, arg) {
     switch (cmd) {
         case "concert-this":
             if (arg.length === 0) {
-                console.log("Please enter artist or band name!");
+                // if no artist nor band specified, it will ask the user to enter it.
+                logFnc("Please enter artist or band name!");
                 break;
             }
             var queryURL = "https://rest.bandsintown.com/artists/" + arg + "/events?app_id=codingbootcamp";
@@ -162,10 +186,11 @@ function runCommand(cmd, arg) {
             axios.get(queryURL).then(logMovie).catch(logError);
             break;
         case "do-what-it-says":
-            readCommands("random.txt");
+            readCommandsFromFile("random.txt");
             break;
         default:
-            console.log("**** invalid command! ****");
+            logFnc("**** invalid command! ****");
+            // will display all command usage.
             displayCommands();
             break;
     }
@@ -174,6 +199,7 @@ function runCommand(cmd, arg) {
 // run this.
 
 if (process.argv.length === 2) {
+    // if user did not enter command , it would log all command usage.
     displayCommands();
 } else {
     runCommand(process.argv[2], titleStr);
