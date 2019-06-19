@@ -1,6 +1,4 @@
-// choose where the output will be logged to.
-const LOG_TO_FILE = true;
-var logFnc =  LOG_TO_FILE?logToFile:console.log;
+const LINE = "------------------------------------\n";
 
 
 // read environment variables with dotenv package.
@@ -27,8 +25,12 @@ if (process.argv.length > 3) {
     var titleStr = process.argv.slice(3).join(" ");
 }
 
-function logToFile(text) {
-    fs.appendFileSync("log.txt", text + "\n", function (err) {
+function logFnc(msg) {
+    // log to terminal.
+    console.log(msg);
+
+    // log to file
+    fs.appendFile("log.txt", msg, function (err) {
 
         // If an error was experienced we will log it.
         if (err) {
@@ -37,15 +39,9 @@ function logToFile(text) {
     });
 }
 
-function logEndLine() {
-    logFnc("--------------------------------\n");
-}
-
-
 function logMovie(response) {
     if (response.data.Response == "False") {
-        logFnc("Movie Not Found!");
-        logEndLine();
+        logFnc("Movie Not Found!\n" + LINE);
         return;
     }
 
@@ -58,43 +54,39 @@ function logMovie(response) {
     }
 
     // console.log(response.data);
-    logFnc("Title: " + response.data.Title);
-    logFnc("Year Released : " + response.data.Year);
-    logFnc("IMDB Rating " + response.data.imdbRating);
-    logFnc("Rotten Tomatoes Rating : " + tomatoRating);
-    logFnc("Country : " + response.data.Country);
-    logFnc("Language : " + response.data.Language);
-    logFnc("Plot : " + response.data.Plot);
-    logFnc("Actors : " + response.data.Actors);
-    logEndLine();
+    var logMsg = "Title: " + response.data.Title + "\n";
+    logMsg += ("\tYear Released : " + response.data.Year + "\n");
+    logMsg += ("\tIMDB Rating " + response.data.imdbRating + "\n");
+    logMsg += ("\tRotten Tomatoes Rating : " + tomatoRating + "\n");
+    logMsg += ("\tCountry : " + response.data.Country + "\n");
+    logMsg += ("\tLanguage : " + response.data.Language + "\n");
+    logMsg += ("\tPlot : " + response.data.Plot + "\n");
+    logMsg += ("\tActors : " + response.data.Actors + "\n");
+    logMsg += LINE;
+    logFnc(logMsg);
 }
 
 function logConcert(response) {
     // console.log(response.data);
-    logFnc(response.data.length + " events found!");
+    var logMsg = response.data.length + " events found!\n";
     for (var i = 0; i < response.data.length; i++) {
-        logFnc("event " + (i + 1));
-        logFnc("   Venue : " + response.data[i].venue.name);
-        logFnc("     City    : " + response.data[i].venue.city);
-        logFnc("     Region  : " + response.data[i].venue.region);
-        logFnc("     Country : " + response.data[i].venue.country);
-        logFnc("   Date of the event : " + moment(response.data[i].datetime).format("MM/DD/YYYY"));
+        logMsg += ("event " + (i + 1) + "\n");
+        logMsg += ("\tVenue   : " + response.data[i].venue.name + "\n");
+        logMsg += ("\tCity    : " + response.data[i].venue.city + "\n");
+        logMsg += ("\tRegion  : " + response.data[i].venue.region + "\n");
+        logMsg += ("\tCountry : " + response.data[i].venue.country + "\n");
+        logMsg += ("\tDate of the event : " + moment(response.data[i].datetime).format("MM/DD/YYYY") + "\n");
     }
-    logEndLine();
+    logMsg += LINE;
+    logFnc(logMsg);
 }
 
 function logSong(response) {
     // console.log(response);
     if (response.tracks.items.length === 0) {
-        logFnc("Song not found!");
-        logEndLine();
+        logFnc("Song Not Found!\n" + LINE);
         return;
     }
-    // console.log(response.tracks.items[0]);
-    // Artist(s)
-    logFnc("Artist(s) : " + response.tracks.items[0].artists[0].name);
-    // The song's name
-    logFnc("Song's name : " + response.tracks.items[0].name);
 
     // A preview link of the song from Spotify
     var previewLink = response.tracks.items[0].preview_url;
@@ -102,39 +94,47 @@ function logSong(response) {
         previewLink = "N/A";
     }
 
-    logFnc("Preview link : " + previewLink);
-
-    // The album that the song is from
-    logFnc("Album : " + response.tracks.items[0].album.name);
-    logEndLine();
+    var logMsg = "Artist(s) : " + response.tracks.items[0].artists[0].name + "\n";
+    logMsg += ("Song's name : " + response.tracks.items[0].name + "\n");
+    logMsg += ("Preview link : " + previewLink + "\n");
+    logMsg += ("Album : " + response.tracks.items[0].album.name + "\n");
+    logMsg += LINE;
+    logFnc(logMsg);
 }
 
 function logError(error) {
+    var logMsg = "";
     if (error.response) {
         // The request was made and the server responded with a status code
         // that falls out of the range of 2xx
-       logFnc(error.response.data);
-       logFnc(error.response.status);
-       logFnc(error.response.headers);
+        logMsg += (error.response.data + "\n");
+        logMsg += (error.response.status + "\n");
+        logMsg += (error.response.header + "\n");
     } else if (error.request) {
         // The request was made but no response was received
         // `error.request` is an object that comes back with details pertaining to the error that occurred.
-       logFnc(error.request);
+        logMsg += (error.request + "\n");
     } else {
         // Something happened in setting up the request that triggered an Error
-       logFnc("Error", error.message);
+        logMsg += ("Error : " + error.message + "\n");
     }
-   logFnc(error.config);
-   logEndLine();
+    logMsg += (error.config + "\n");
+    logMsg += LINE;
+    logFnc(logMsg);
 }
 
-function displayCommands() {
-    logFnc("Please enter one of the following commands!");
-    logFnc("node liri.js concert-this <artist/band name>");
-    logFnc("node liri.js spotify-this-song <song name>");
-    logFnc("node liri.js movie-this <movie name>");
-    logFnc("node liri.js do-what-it-says");
-    logEndLine();
+function displayCommands(header) {
+    var logMsg = "";
+    if (header) {
+        logMsg += header + "\n";
+    }
+    logMsg += "Please enter one of the following commands!\n";
+    logMsg += "\tnode liri.js concert-this <artist/band name>\n";
+    logMsg += "\tnode liri.js spotify-this-song <song name>\n";
+    logMsg += "\tnode liri.js movie-this <movie name>\n";
+    logMsg += "\tnode liri.js do-what-it-says\n";
+    logMsg += LINE;
+    logFnc(logMsg);
 }
 
 function readCommandsFromFile(filename) {
@@ -143,7 +143,8 @@ function readCommandsFromFile(filename) {
         // If the code experiences any errors it will log the error to the console.
 
         if (error) {
-            return console.log(error);
+            logFnc(error);
+            return;
         }
 
         // We will then print the contents of data. data is a string.
@@ -153,7 +154,6 @@ function readCommandsFromFile(filename) {
         var dataArr = data.split(",");
 
         // Extracting command and argument.
-        var cmdStr = dataArr[0];
         var datStr = dataArr[1].replace(/"/g, "");
         runCommand(dataArr[0], datStr);
 
@@ -166,19 +166,21 @@ function runCommand(cmd, arg) {
         case "concert-this":
             if (arg.length === 0) {
                 // if no artist nor band specified, it will ask the user to enter it.
-                logFnc("Please enter artist or band name!");
+                logFnc("Please enter artist or band name!\n" + LINE);
                 break;
             }
             var queryURL = "https://rest.bandsintown.com/artists/" + arg + "/events?app_id=codingbootcamp";
             axios.get(queryURL).then(logConcert).catch(logError);
             break;
         case "spotify-this-song":
+            // if no song entered, it will search "The Sign by Ace of base"
             if (arg.length === 0) {
                 arg = "The Sign Ace of base";
             }
             spotify.search({ type: 'track', query: arg }).then(logSong).catch(logError);
             break;
         case "movie-this":
+            // if no movie entered, it will search "Mr. Nobody"
             if (arg.length === 0) {
                 arg = "Mr. Nobody";
             }
@@ -189,9 +191,8 @@ function runCommand(cmd, arg) {
             readCommandsFromFile("random.txt");
             break;
         default:
-            logFnc("**** invalid command! ****");
             // will display all command usage.
-            displayCommands();
+            displayCommands("**** invalid command! ****");
             break;
     }
 }
