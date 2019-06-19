@@ -17,6 +17,8 @@ The is a node.js terminal based application.  Use will need to enter a command o
 6. All output data will be written into "log.txt" file.
 ![Image of log](images/logfile.jpg)
 
+### Click [here](https://github.com/kkiathub/liri-node-app) to go the the github repository.
+
 ### In the code...
     - We use node.js and javascript.
     - Node-Spotify-Api package is used to obtain song information.
@@ -26,7 +28,5 @@ The is a node.js terminal based application.  Use will need to enter a command o
     - Bands in Town Artist Events API is used to obtain artist/band information.
     - OMDB API is used to obtain movie information.
 
-### Problem encountered...
-Initially, when we called fs.appendFile to log data into the output file, sometimes, the output text was not in the right order.  This is an issue caused by how the asynchronous function works.  Therefore, instead of calling multiple appendFile() , we created a string to save all data and call appendFile() once.  This solves the issue and also is a good way to handle the file system because the output file is only opened once each command is executed. 
-
-### Click [here](https://github.com/kkiathub/liri-node-app) to go the the github repository.
+### Credit
+Kanwee Kiatnikorn : Design, Coding, and Testing.
