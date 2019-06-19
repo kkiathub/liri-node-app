@@ -25,11 +25,15 @@ if (process.argv.length > 3) {
     var titleStr = process.argv.slice(3).join(" ");
 }
 
-function logFnc(msg) {
+// if logCommand is true, it will log the command entered to file.
+function logFnc(msg, logCommand = false) {
     // log to terminal.
     console.log(msg);
 
     // log to file
+    if (logCommand) {
+        msg = "Command entered : node liri.js " + process.argv.slice(2).join(" ") + "\n" + msg;
+    }
     fs.appendFile("log.txt", msg, function (err) {
 
         // If an error was experienced we will log it.
@@ -54,7 +58,7 @@ function logMovie(response) {
     }
 
     // console.log(response.data);
-    var logMsg = "Title: " + response.data.Title + "\n";
+    var logMsg = "\tTitle: " + response.data.Title + "\n";
     logMsg += ("\tYear Released : " + response.data.Year + "\n");
     logMsg += ("\tIMDB Rating " + response.data.imdbRating + "\n");
     logMsg += ("\tRotten Tomatoes Rating : " + tomatoRating + "\n");
@@ -63,7 +67,7 @@ function logMovie(response) {
     logMsg += ("\tPlot : " + response.data.Plot + "\n");
     logMsg += ("\tActors : " + response.data.Actors + "\n");
     logMsg += LINE;
-    logFnc(logMsg);
+    logFnc(logMsg, true);
 }
 
 function logConcert(response) {
@@ -78,7 +82,7 @@ function logConcert(response) {
         logMsg += ("\tDate of the event : " + moment(response.data[i].datetime).format("MM/DD/YYYY") + "\n");
     }
     logMsg += LINE;
-    logFnc(logMsg);
+    logFnc(logMsg, true);
 }
 
 function logSong(response) {
@@ -93,13 +97,12 @@ function logSong(response) {
     if (previewLink === null) {
         previewLink = "N/A";
     }
-
     var logMsg = "Artist(s) : " + response.tracks.items[0].artists[0].name + "\n";
     logMsg += ("Song's name : " + response.tracks.items[0].name + "\n");
     logMsg += ("Preview link : " + previewLink + "\n");
     logMsg += ("Album : " + response.tracks.items[0].album.name + "\n");
     logMsg += LINE;
-    logFnc(logMsg);
+    logFnc(logMsg, true);
 }
 
 function logError(error) {
