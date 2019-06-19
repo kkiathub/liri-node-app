@@ -73,7 +73,7 @@ function logMovie(response) {
 function logConcert(response) {
     // console.log(response.data);
     var logMsg = response.data.length + " events found!\n";
-    for (var i = 0; i < response.data.length; i++) {
+    for (var i = 0; (i < response.data.length) && (i<5) ; i++) {
         logMsg += ("event " + (i + 1) + "\n");
         logMsg += ("\tVenue   : " + response.data[i].venue.name + "\n");
         logMsg += ("\tCity    : " + response.data[i].venue.city + "\n");
@@ -157,7 +157,16 @@ function readCommandsFromFile(filename) {
         var dataArr = data.split(",");
 
         // Extracting command and argument.
-        var datStr = dataArr[1].replace(/"/g, "");
+        var datStr = "";
+        var newLineIdx = dataArr[1].search(/\n/);
+        if (newLineIdx>0) {
+            // there are multiple lines in the file.  only read the 1st line.
+            datStr = dataArr[1].slice(0, newLineIdx);
+        } else {
+            // only 1 line in the file.
+            datStr = dataArr[1];
+        }
+        datStr = datStr.replace(/"/g, "");
         runCommand(dataArr[0], datStr);
 
     });
