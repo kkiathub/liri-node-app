@@ -1,7 +1,7 @@
 # liri-node-app
 
 ### Overview
-The is a node.js terminal based application.  Use will need to enter a command on the terminal.  There is no user interface.  After entering the command line, the code will extract command and arguments , then pass the arguments to the right function.
+This is a node.js terminal based application.  User will need to enter a command on the terminal.  There is no user interface.  After entering the command line, the code will extract command and arguments , then pass the arguments to the right function.
 
 ### How to use.
 1. User can enter 'node liri.js' to see all available commands.
